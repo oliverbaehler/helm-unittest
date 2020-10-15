@@ -9,10 +9,12 @@ import (
 	"github.com/lrills/helm-unittest/pkg/unittest"
 	"github.com/lrills/helm-unittest/pkg/unittest/formatter"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-// testOptions stores options setup by user in command line
+// testOptions stres options setup by user in command line
 type testOptions struct {
+	config         string
 	useHelmV3      bool
 	colored        bool
 	updateSnapshot bool
@@ -98,6 +100,14 @@ func main() {
 }
 
 func init() {
+  cobra.OnInitialize(initConfig)
+
+
+	cmd.PersistentFlags().StringVar(
+		&testConfig.config, "config", "",
+		"config ish mea",
+	)
+
 	cmd.PersistentFlags().BoolVar(
 		&testConfig.colored, "color", false,
 		"enforce printing colored output even stdout is not a tty. Set to false to disable color",
@@ -133,4 +143,23 @@ func init() {
 		&testConfig.useHelmV3, "helm3", "3", false,
 		"parse helm charts as helm3 charts.",
 	)
+
+  viper.BindPFlag("helm3", cmd.PersistentFlags().Lookup("helm3"))
+
+	fmt.Println(testConfig)
+
+}
+
+
+
+func initConfig() {
+  if testConfig.config != "" {
+		viper.SetConfigFile(testConfig.config)
+		// If a config file is found, read it in.
+		if err := viper.ReadInConfig(); err == nil {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		} else {
+			fmt.Println(err)
+		}
+	}
 }

@@ -1,0 +1,3 @@
+helm3: true
+useHelmV3: true
+outputFile: "/home/oliver/Projects/helm-unittest/test.md"
